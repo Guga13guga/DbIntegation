@@ -1,5 +1,6 @@
 ﻿using DbIntegation.Database;
 using DbIntegation.Dto;
+using DbIntegation.Entitites;
 using Microsoft.EntityFrameworkCore;
 
 namespace DbIntegation.Models;
@@ -11,6 +12,39 @@ public class UserService
     public UserService(IConfiguration config)
     {
         _context = new DbIntegrationDbContext(config);
+    }
+
+    public bool Registration(RegistrationDto req)
+    {
+        var role = _context.Roles.FirstOrDefault(i => i.Name == "USER");
+        if (role is null) return false;
+        var User = new User
+        {
+            Email = req.UserEmail,
+            Name = req.Name,
+            Password = req.Password,
+            RoleId = role.Id,
+            UserName = req.UserName,
+        };
+
+        _context.Users.Add(User);
+        _context.SaveChanges();
+        return true;
+    }
+
+    public UserDto? SignIn(SignInDto req)
+    {
+        var user = _context.Users.Include(i => i.Role).SingleOrDefault(i => i.Email == req.Email && i.Password == req.Password);
+        if (user is null) return null;
+        return new UserDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            RoleId = user.RoleId,
+            UserEmail = user.Email,
+            UserName = user.Name,
+            RoleName = user.Role?.Name
+        };
     }
 
     public List<UserDto> GetAllUsers()

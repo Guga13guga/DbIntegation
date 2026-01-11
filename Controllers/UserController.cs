@@ -14,7 +14,8 @@ public class UserController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var user = _userService.GetAllUsers();
+        return View(user);
     }
 
     public IActionResult View(int id)
@@ -22,5 +23,10 @@ public class UserController : Controller
         var user = _userService.GetUserById(id);
         if (user is null) return NotFound("no User found");
         return View(user);
+    }
+
+    public IActionResult Create()
+    {
+        return View();
     }
 }

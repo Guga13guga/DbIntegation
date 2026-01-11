@@ -1,6 +1,9 @@
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddControllersWithViews();
+
+builder.WebHost.UseKestrel(i =>
+    i.ListenAnyIP(2000)
+);
 
 var app = builder.Build();
 
